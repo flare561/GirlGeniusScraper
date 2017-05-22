@@ -58,21 +58,23 @@ def create_cbz_from_dates(start_date=None, end_date=date.today(), cbz_location='
     with ZipFile(cbz_location, "a") as zf:
         if start_date is None:
             start_date, start_index = parse_comment(zf.comment)
-        fetch_pool = ThreadPool(8)
-        link_pool = ThreadPool(8)
-        for i, file in enumerate(fetch_pool.imap(
-                download_image,
-                flatten(link_pool.imap(
-                            get_links_for_date,
-                            mwf(start_date, end_date)
-                            )),
-                chunksize=100
-                )):
-            zf.writestr(f"{(i + start_index):04}.jpg", file)
+        if start_date < end_date:
+            fetch_pool = ThreadPool(8)
+            link_pool = ThreadPool(8)
+            for i, file in enumerate(fetch_pool.imap(
+                    download_image,
+                    flatten(link_pool.imap(
+                                get_links_for_date,
+                                mwf(start_date, end_date)
+                                )),
+                    chunksize=100
+                    )):
+                zf.writestr(f"{(i + start_index):04}.jpg", file)
         try:
             zf.comment = bytes(f"{end_date:%Y%m%d} {i + start_index}", "utf-8")
         except UnboundLocalError:
             print("No new comics.")
+
 
 if __name__ == "__main__":
     try:
