@@ -8,9 +8,7 @@ from retrying import retry
 
 
 def mwf(start_date, end_date=date.today()):
-    """
-    Generator that returns a string for every Monday, Wednesday, or Friday between start and end date.
-    """
+    """Generator that returns a string for every Monday, Wednesday, or Friday between start and end date."""
     while start_date <= end_date:
         if start_date.weekday() in [0, 2, 4]:
             yield f"{start_date:%Y%m%d}"
@@ -18,9 +16,7 @@ def mwf(start_date, end_date=date.today()):
 
 @retry(stop_max_attempt_number=3, retry_on_result=lambda x: x is None)
 def get_links_for_date(date):
-    """
-    Function to retrieve the image links for a given date.
-    """
+    """Function to retrieve the image links for a given date."""
     comic_url = f"http://www.girlgeniusonline.com/comic.php?date={date}"
     try:
         resp = urlopen(comic_url)
@@ -32,9 +28,7 @@ def get_links_for_date(date):
 
 @retry(stop_max_attempt_number=3, retry_on_result=lambda x: x is None)
 def download_image(url):
-    """
-    Function to download a given url and return the results.
-    """
+    """Function to download a given url and return the results."""
     print(f"Downloading {url}")
     try:
         resp = urlopen(url)
@@ -44,9 +38,7 @@ def download_image(url):
         print(f"Download of {url} failed.")
 
 def parse_comment(comment):
-    """
-    Function to parse the comment from the zipfile
-    """
+    """Function to parse the comment from the zipfile."""
     try:
         last_date, start_index = comment.decode('utf-8').split()
         start_index = int(start_index) + 1
@@ -57,15 +49,11 @@ def parse_comment(comment):
     return start_date, start_index
 
 def flatten(in_list):
-    """
-    Generator to take a nested list and return a flat list
-    """
+    """Generator to take a nested list and return a flat list."""
     return (item for listitem in in_list for item in listitem)
 
 def create_cbz_from_dates(start_date=None, end_date=date.today(), cbz_location='girlgenius.cbz'):
-    """
-    Function to download all comics after a given date.
-    """
+    """Function to download all comics after a given date."""
     print("Getting Image URLs")
     with ZipFile(cbz_location, "a") as zf:
         if start_date is None:
